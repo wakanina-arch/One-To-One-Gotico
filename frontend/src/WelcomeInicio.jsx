@@ -92,7 +92,7 @@ const getFraseAleatoria = () => {
   };
 };
 
-export default function WelcomeInicio({ onSelectCategory, usuario }) {
+export default function WelcomeInicio({ onSelectCategory, usuario, onAbrirRegistro, onDashboard}) {
   const [showRegister, setShowRegister] = useState(false);
   
   // ✅ CORREGIDO: useState con función para generar frase UNA SOLA VEZ
@@ -256,6 +256,16 @@ export default function WelcomeInicio({ onSelectCategory, usuario }) {
 
         {/* 💧 ELEMENTO AGUA - Footer */}
         <p style={styles.footer}>— DESDE EL BARRO —</p>
+   
+        {/* 🛡️ DASHBOARD - Solo visible para administradores */}
+{usuario && usuario.rol === 'admin_restaurante' && (
+  <button 
+    onClick={onDashboard} 
+    style={styles.btnDashboard}
+  >
+    🛡️ DASHBOARD ADMIN
+  </button>
+)}
         
         {/* 🌑 Elemento VACÍO */}
         <div style={{
@@ -372,5 +382,20 @@ const styles = {
     letterSpacing: "4px", 
     opacity: 0.5,
     fontFamily: "'Cormorant Garamond', serif"
-  }
+  },
+  btnDashboard: {
+  background: "linear-gradient(135deg, #FFD700, #FF4500)",
+  border: "none",
+  padding: "8px 16px",
+  borderRadius: "30px",
+  color: "#1a0a0a",
+  fontWeight: "bold",
+  fontSize: "0.8rem",
+  cursor: "pointer",
+  marginBottom: "10px",
+  textTransform: "uppercase",
+  letterSpacing: "1px",
+  transition: "all 0.3s ease",
+  boxShadow: "0 2px 8px rgba(255,215,0,0.3)"
+}
 };

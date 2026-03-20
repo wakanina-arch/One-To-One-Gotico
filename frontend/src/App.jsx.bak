@@ -5,7 +5,7 @@ import CategoriaScreen2 from "./components/CategoriaScreen2";
 import ResumenPedido from "./ResumenPedido"; 
 import SeccionPago from "./components/SeccionPago";
 import TicketConfirmacion from "./components/TicketConfirmacion";
-import AdminPage from "./AdminPage";import AdminPage from "./components/AdminPage";import AdminPage from "./components/AdminPage";import BarraSuperior from "./layout/BarraSuperior";
+import BarraSuperior from "./layout/BarraSuperior";
 import PerfilDesplegable from "./layout/PerfilDesplegable";
 import MenuDesplegable from "./layout/MenuDesplegable";
 import RegisterModal from "./components/RegisterModal";
@@ -91,13 +91,7 @@ function AppContent() {
   const [modoRegistro, setModoRegistro] = useState('registro');
 
   const [usuario, setUsuario] = useState(() => {
-  const [pendingOrders, setPendingOrders] = useState([]);
-  const [finishedOrders, setFinishedOrders] = useState([]);
-  const [log, setLog] = useState([]);  const [pendingOrders, setPendingOrders] = useState([]);
-  const [finishedOrders, setFinishedOrders] = useState([]);
-  const [log, setLog] = useState([]);  const [pendingOrders, setPendingOrders] = useState([]);
-  const [finishedOrders, setFinishedOrders] = useState([]);
-  const [log, setLog] = useState([]);    const savedUser = localStorage.getItem('oneToOneUser');
+    const savedUser = localStorage.getItem('oneToOneUser');
     return savedUser ? JSON.parse(savedUser) : null;
   });
 
@@ -159,15 +153,6 @@ function AppContent() {
   };
 
   const finalizarCompra = (datosPago) => {
-  const addLog = (nuevoLog) => {
-    setLog(prev => [nuevoLog, ...prev]);
-  };
-  const addLog = (nuevoLog) => {
-    setLog(prev => [nuevoLog, ...prev]);
-  };
-  const addLog = (nuevoLog) => {
-    setLog(prev => [nuevoLog, ...prev]);
-  };
     console.log('💳 finalizarCompra - datos:', datosPago);
     console.log('💳 App - frase antes de ticket:', fraseOraculo);
     
@@ -242,7 +227,7 @@ function AppContent() {
         <div style={{ flex: 1, overflow: 'auto', position: 'relative', zIndex: 1 }}>
           
           {pantalla === 'welcome' && (
-            <WelcomeInicio onDashboard={() => setPantalla("admin")} onDashboard={() => setPantalla("admin")} onDashboard={() => setPantalla("admin")} 
+            <WelcomeInicio 
               usuario={usuario} 
               onSelectCategory={irACategoria}
               onAbrirRegistro={abrirRegistro}
@@ -322,20 +307,6 @@ function AppContent() {
                 clearCart(); 
                 setPantalla('welcome'); 
               }}
-
-          {pantalla === 'admin' && (
-            <AdminPage 
-              menuItems={[]}
-              onSaveMenu={(menu) => console.log("Guardar menú:", menu)}
-              log={log}
-              addLog={addLog}
-              pendingOrders={pendingOrders}
-              setPendingOrders={setPendingOrders}
-              finishedOrders={finishedOrders}
-              setFinishedOrders={setFinishedOrders}
-              onBack={() => setPantalla("welcome")}
-            />
-          )}
             />
           )}
         </div>
