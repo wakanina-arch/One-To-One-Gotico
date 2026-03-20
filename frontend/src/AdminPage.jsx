@@ -5,61 +5,30 @@ import KitchenKanban from './components/KitchenKanban';
 import OrdersLogDrawer from './components/OrdersLogDrawer';
 import PromosDrawer from './PromosDrawer';
 
-export default function AdminPage({ onBack,  
-  menuItems, onSaveMenu, log, addLog, 
-  pendingOrders, setPendingOrders, 
-  finishedOrders, setFinishedOrders 
-}) {
-
-  const [drawers, setDrawers] = useState({
-    menu: false, orders: false, log: false, promos: false
-  });
-
+export default function AdminPage({ onBack, menuItems, onSaveMenu, log, addLog, pendingOrders, setPendingOrders, finishedOrders, setFinishedOrders }) {
+  const [drawers, setDrawers] = useState({ menu: false, orders: false, log: false, promos: false });
   const toggleDrawer = (name, val) => setDrawers(prev => ({ ...prev, [name]: val }));
-
   const totalCaja = finishedOrders.reduce((acc, order) => acc + (parseFloat(order.total) || 0), 0);
-
   const handlePayment = () => {
-    addLog({
-      tipo: 'Salida',
-      pedido: 'PAGO-CAJA',
-      usuario: 'Administrador',
-      hora: new Date().toLocaleTimeString(),
-      detalle: `Cobro de caja: $${totalCaja.toFixed(2)}`
-    });
+    addLog({ tipo: 'Salida', pedido: 'PAGO-CAJA', usuario: 'Administrador', hora: new Date().toLocaleTimeString(), detalle: `Cobro de caja: $${totalCaja.toFixed(2)}` });
     setFinishedOrders([]);
   };
-
   return (
     <section style={styles.container}>
       <header style={styles.header}>
         <h2 style={styles.titulo}>📊 PANEL DE CONTROL <span style={{color: '#FFD700'}}>ONE TO ONE</span></h2>
         <p style={styles.subtitulo}>GESTIÓN ESTRATÉGICA DEL BANQUETE</p>
       </header>
-      
       <div style={styles.grid}>
-        {/* TARJETA DE CAJA (EGO/ÉXITO) */}
         <div style={{...styles.card, borderTop: '5px solid #27ae60'}}>
           <h3 style={styles.cardTitle}>💰 ESTADO DE CAJA</h3>
           <div style={styles.totalDisplay}>
             <span style={{fontSize: '0.8rem', color: '#666'}}>RECAUDACIÓN ACTUAL</span>
             <strong style={styles.monto}>${totalCaja.toFixed(2)}</strong>
           </div>
-          <EntregaPedido 
-            finishedOrders={finishedOrders} 
-            setFinishedOrders={setFinishedOrders} 
-            addLog={addLog} 
-          />
-          <button 
-            style={totalCaja > 0 ? styles.btnCobrarActive : styles.btnDisabled}
-            onClick={handlePayment}
-            disabled={totalCaja === 0}
-          >
-            LIQUIDAR CAJA ({finishedOrders.length})
-          </button>
+          <EntregaPedido finishedOrders={finishedOrders} setFinishedOrders={setFinishedOrders} addLog={addLog} />
+          <button style={totalCaja > 0 ? styles.btnCobrarActive : styles.btnDisabled} onClick={handlePayment} disabled={totalCaja === 0}>LIQUIDAR CAJA ({finishedOrders.length})</button>
         </div>
-
-        {/* TARJETA DE COCINA (ACCIÓN/BRASA) */}
         <div style={{...styles.card, borderTop: '5px solid #FF4500'}}>
           <h3 style={styles.cardTitle}>👨‍🍳 CONTROL DE BRASA</h3>
           <div style={styles.statsRow}>
@@ -67,13 +36,9 @@ export default function AdminPage({ onBack,
               <span style={styles.statNum}>{pendingOrders.length}</span>
               <span style={styles.statLabel}>EN COLA</span>
             </div>
-            <button style={styles.btnAccion} onClick={() => toggleDrawer('orders', true)}>
-              ABRIR KANBAN 🔥
-            </button>
+            <button style={styles.btnAccion} onClick={() => toggleDrawer('orders', true)}>ABRIR KANBAN 🔥</button>
           </div>
         </div>
-
-        {/* GESTIÓN DE MENÚ Y PROMOS */}
         <div style={styles.card}>
           <h3 style={styles.cardTitle}>📝 INVENTARIO</h3>
           <p style={styles.infoText}>{menuItems.length} platos en catálogo</p>
@@ -82,38 +47,21 @@ export default function AdminPage({ onBack,
             <button style={styles.btnSecundario} onClick={() => toggleDrawer('promos', true)}>PROMOS</button>
           </div>
         </div>
-
-        {/* REGISTRO Y CIERRE */}
         <div style={styles.card}>
           <h3 style={styles.cardTitle}>⏰ FINALIZAR DÍA</h3>
           <p style={styles.infoText}>{log.length} movimientos hoy</p>
           <div style={{display: 'flex', gap: '10px'}}>
             <button style={styles.btnSecundario} onClick={() => toggleDrawer('log', true)}>VER LOGS</button>
-            <button style={styles.btnCierre} onClick={() => {/* Lógica cierre */}}>CIERRE</button>
+            <button style={styles.btnCierre} onClick={() => {}}>CIERRE</button>
           </div>
         </div>
       </div>
-
-      {/* DRAWERS - Inyectando los componentes que ya tienes */}
       <EditMenuDrawer open={drawers.menu} onClose={() => toggleDrawer('menu', false)} menuItems={menuItems} onSave={onSaveMenu} />
       <KitchenKanban open={drawers.orders} onClose={() => toggleDrawer('orders', false)} pendingOrders={pendingOrders} setPendingOrders={setPendingOrders} finishedOrders={finishedOrders} setFinishedOrders={setFinishedOrders} addLog={addLog} />
       <OrdersLogDrawer open={drawers.log} onClose={() => toggleDrawer('log', false)} log={log} />
       <PromosDrawer open={drawers.promos} onClose={() => toggleDrawer('promos', false)} menuItems={menuItems} onSaveMenu={onSaveMenu} />
-         <button onClick={onBack} style={{
-        marginTop: "20px",
-        padding: "12px 24px",
-        background: "linear-gradient(135deg, #FFD700, 
-#FF4500)",
-        border: "none",
-        borderRadius: "30px",
-        color: "#1a0a0a",
-        fontWeight: "bold",
-        cursor: "pointer",
-        width: "100%",
-        fontSize: "0.9rem",
-        fontFamily: "'Cormorant Garamond', serif"
-      }}>← VOLVER AL ORÁCULO</button>
- </section>
+      <button onClick={onBack} style={{ marginTop: '20px', padding: '12px 24px', background: 'linear-gradient(135deg, #FFD700, #FF4500)', border: 'none', borderRadius: '30px', color: '#1a0a0a', fontWeight: 'bold', cursor: 'pointer', width: '100%', fontSize: '0.9rem', fontFamily: "'Cormorant Garamond', serif" }}>← VOLVER AL ORÁCULO</button>
+    </section>
   );
 }
 

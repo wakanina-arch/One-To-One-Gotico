@@ -5,14 +5,15 @@ import CategoriaScreen2 from "./components/CategoriaScreen2";
 import ResumenPedido from "./ResumenPedido"; 
 import SeccionPago from "./components/SeccionPago";
 import TicketConfirmacion from "./components/TicketConfirmacion";
-import BarraSuperior from "./layout/BarraSuperior";
+import AdminPage from "./AdminPage";import AdminPage from "./components/AdminPage";import AdminPage from "./components/AdminPage";import BarraSuperior from "./layout/BarraSuperior";
 import PerfilDesplegable from "./layout/PerfilDesplegable";
 import MenuDesplegable from "./layout/MenuDesplegable";
 import RegisterModal from "./components/RegisterModal";
+import AdminDashboard from "./components/AdminDashboard";
 import AdminPage from "./AdminPage";
 import './index.css';
 
-// BASE DE DATOS COMPLETA
+// BASE DE DATOS COMPLETA (la misma que tienes)
 const database = {
   primero: { 
     titulo: 'COMPLEMENTOS', icono: '🍟',
@@ -69,54 +70,88 @@ const database = {
 };
 
 function AppContent() {
+  // Extraemos TODAS las funciones del carrito
   const { cartItems, addToCart, updateQuantity, removeFromCart, clearCart, calculateTotal } = useCart();
+  
+  console.log('🏠 AppContent - cartItems:', cartItems);
+  console.log('🏠 AppContent - total:', calculateTotal());
   
   const [pantalla, setPantalla] = useState('welcome');
   const [categoriaActual, setCategoriaActual] = useState(null);
   const [fraseOraculo, setFraseOraculo] = useState(""); 
   const [datosFinales, setDatosFinales] = useState({ total: 0, metodo: '', ordenId: '' });
   const [tipoEntrega, setTipoEntrega] = useState('local');
+
+  // Estados para menús desplegables
   const [perfilAbierto, setPerfilAbierto] = useState(false);
   const [menuAbierto, setMenuAbierto] = useState(false);
+  
+  // Estados para el modal de registro/edición
   const [modalRegisterAbierto, setModalRegisterAbierto] = useState(false);
   const [modoRegistro, setModoRegistro] = useState('registro');
-  const [pendingOrders, setPendingOrders] = useState([]);
-  const [finishedOrders, setFinishedOrders] = useState([]);
-  const [log, setLog] = useState([]);
 
   const [usuario, setUsuario] = useState(() => {
-    const savedUser = localStorage.getItem('oneToOneUser');
+  const [pendingOrders, setPendingOrders] = useState([]);
+  const [finishedOrders, setFinishedOrders] = useState([]);
+  const [log, setLog] = useState([]);  const [pendingOrders, setPendingOrders] = useState([]);
+  const [finishedOrders, setFinishedOrders] = useState([]);
+  const [log, setLog] = useState([]);  const [pendingOrders, setPendingOrders] = useState([]);
+  const [finishedOrders, setFinishedOrders] = useState([]);
+  const [log, setLog] = useState([]);    const savedUser = localStorage.getItem('oneToOneUser');
     return savedUser ? JSON.parse(savedUser) : null;
   });
 
   const totalNeto = calculateTotal();
 
-  const addLog = (nuevoLog) => {
-    setLog(prev => [nuevoLog, ...prev]);
+  // Funciones para menús (UNA SOLA VEZ CADA UNA)
+  const togglePerfil = () => {
+    console.log('👤 togglePerfil - actual:', perfilAbierto);
+    setPerfilAbierto(!perfilAbierto);
+  };
+  
+  const cerrarPerfil = () => {
+    console.log('👤 cerrarPerfil');
+    setPerfilAbierto(false);
+  };
+  
+  const toggleMenu = () => {
+    console.log('📋 toggleMenu - actual:', menuAbierto);
+    setMenuAbierto(!menuAbierto);
+  };
+  
+  const cerrarMenu = () => {
+    console.log('📋 cerrarMenu');
+    setMenuAbierto(false);
   };
 
-  const togglePerfil = () => setPerfilAbierto(!perfilAbierto);
-  const cerrarPerfil = () => setPerfilAbierto(false);
-  const toggleMenu = () => setMenuAbierto(!menuAbierto);
-  const cerrarMenu = () => setMenuAbierto(false);
+  // Funciones para modal de registro/edición
   const abrirRegistro = () => {
+    console.log('📝 Abriendo registro');
     setModoRegistro('registro');
     setModalRegisterAbierto(true);
   };
+
   const abrirEditarPerfil = () => {
+    console.log('🔧 Abriendo edición de perfil');
     setModoRegistro('editar');
     setModalRegisterAbierto(true);
     setPerfilAbierto(false);
   };
-  const cerrarModal = () => setModalRegisterAbierto(false);
-  
+
+  const cerrarModal = () => {
+    console.log('❌ Cerrando modal');
+    setModalRegisterAbierto(false);
+  };
+
   const manejarRegistro = (usuarioActualizado) => {
+    console.log('📝 Usuario actualizado:', usuarioActualizado);
     localStorage.setItem('oneToOneUser', JSON.stringify(usuarioActualizado));
     setUsuario(usuarioActualizado);
     setModalRegisterAbierto(false);
   };
 
   const irACategoria = (id, fraseRecibida) => {
+    console.log('➡️ App - frase recibida:', fraseRecibida);
     if (fraseRecibida) setFraseOraculo(fraseRecibida); 
     setCategoriaActual(id); 
     setPantalla('categoria');
@@ -124,8 +159,21 @@ function AppContent() {
   };
 
   const finalizarCompra = (datosPago) => {
+  const addLog = (nuevoLog) => {
+    setLog(prev => [nuevoLog, ...prev]);
+  };
+  const addLog = (nuevoLog) => {
+    setLog(prev => [nuevoLog, ...prev]);
+  };
+  const addLog = (nuevoLog) => {
+    setLog(prev => [nuevoLog, ...prev]);
+  };
+    console.log('💳 finalizarCompra - datos:', datosPago);
+    console.log('💳 App - frase antes de ticket:', fraseOraculo);
+    
     const metodoPago = typeof datosPago === 'string' ? datosPago : datosPago.metodo;
     const datosContacto = typeof datosPago === 'object' ? datosPago.datosContacto : {};
+    
     const idGenerado = `QR-${Math.random().toString(36).substr(2, 6).toUpperCase()}`;
     
     setDatosFinales({ 
@@ -135,6 +183,7 @@ function AppContent() {
       datosContacto: datosContacto,
       frase: fraseOraculo
     });
+    
     setPantalla('ticket');
   };
 
@@ -149,6 +198,7 @@ function AppContent() {
         borderRadius: '35px', border: '1px solid rgba(255,215,0,0.15)', boxShadow: '0 0 40px rgba(0,0,0,0.9)'
       }}>
         
+        {/* BARRA SUPERIOR - SOLO EN PANTALLAS QUE NO SEAN WELCOME */}
         {pantalla !== 'welcome' && (
           <div style={{ position: 'relative', zIndex: 10 }}>
             <BarraSuperior 
@@ -161,18 +211,21 @@ function AppContent() {
           </div>
         )}
 
-        <MenuDesplegable 
-          abierto={menuAbierto}
-          onClose={cerrarMenu}
-          onSelectCategoria={(id) => {
-            if (id === 'welcome') {
-              setPantalla('welcome');
-            } else {
-              irACategoria(id, fraseOraculo);
-            }
-          }}
-        />
+        {/* MENÚ DESPLEGABLE */}
+<MenuDesplegable 
+  abierto={menuAbierto}
+  onClose={cerrarMenu}
+  onSelectCategoria={(id) => {
+    if (id === 'welcome') {
+      setPantalla('welcome'); // 🌀 Vuelve al Origen
+    } else {
+      irACategoria(id, fraseOraculo); // 🍖 Va a la comida
+    }
+  }}
+/>
 
+
+        {/* PERFIL DESPLEGABLE */}
         <PerfilDesplegable 
           abierto={perfilAbierto}
           onClose={cerrarPerfil}
@@ -185,10 +238,11 @@ function AppContent() {
           }}
         />
 
+        {/* CONTENIDO PRINCIPAL */}
         <div style={{ flex: 1, overflow: 'auto', position: 'relative', zIndex: 1 }}>
           
           {pantalla === 'welcome' && (
-            <WelcomeInicio 
+            <WelcomeInicio onDashboard={() => setPantalla("admin")} onDashboard={() => setPantalla("admin")} onDashboard={() => setPantalla("admin")} 
               usuario={usuario} 
               onSelectCategory={irACategoria}
               onAbrirRegistro={abrirRegistro}
@@ -200,9 +254,18 @@ function AppContent() {
             <CategoriaScreen2
               usuario={usuario}
               categoria={database[categoriaActual]}
-              onBack={() => setPantalla('welcome')}
-              onVerCarrito={() => setPantalla('resumen')}
-              onAddToCart={addToCart}
+              onBack={() => {
+                console.log('⬅️ onBack');
+                setPantalla('welcome');
+              }}
+              onVerCarrito={() => {
+                console.log('🛒 onVerCarrito - items:', cartItems.length);
+                setPantalla('resumen');
+              }}
+              onAddToCart={(item) => {
+                console.log('➕ onAddToCart desde CategoriaScreen2:', item);
+                addToCart(item);
+              }}
               carritoCount={cartItems.length}
             />
           )}
@@ -216,10 +279,22 @@ function AppContent() {
               total={(calculateTotal() * 1.15 + (tipoEntrega === 'domicilio' ? 2 : 0)).toFixed(2)}
               tipoEntrega={tipoEntrega}
               setTipoEntrega={setTipoEntrega}
-              alConfirmar={() => setPantalla('pago')}
-              alVolver={() => setPantalla('categoria')}
-              modificarCantidad={updateQuantity}
-              eliminarDelCarrito={removeFromCart}
+              alConfirmar={() => {
+                console.log('✅ alConfirmar desde Resumen - yendo a pago');
+                setPantalla('pago');
+              }}
+              alVolver={() => {
+                console.log('⬅️ alVolver desde Resumen');
+                setPantalla('categoria');
+              }}
+              modificarCantidad={(id, delta) => {
+                console.log('🔄 modificarCantidad:', id, delta);
+                updateQuantity(id, delta);
+              }}
+              eliminarDelCarrito={(id) => {
+                console.log('🗑️ eliminarDelCarrito:', id);
+                removeFromCart(id);
+              }}
             />
           )}
 
@@ -227,8 +302,14 @@ function AppContent() {
             <SeccionPago
               total={totalNeto}
               carrito={cartItems}
-              alVolver={() => setPantalla('resumen')}
-              alConfirmar={finalizarCompra}
+              alVolver={() => {
+                console.log('⬅️ alVolver desde Pago');
+                setPantalla('resumen');
+              }}
+              alConfirmar={(metodo) => {
+                console.log('💳 alConfirmar desde Pago:', metodo);
+                finalizarCompra(metodo);
+              }}
             />
           )}
 
@@ -237,11 +318,10 @@ function AppContent() {
               datos={datosFinales}
               pedido={cartItems}
               onCerrar={() => { 
+                console.log('🏁 onCerrar - limpiando todo');
                 clearCart(); 
                 setPantalla('welcome'); 
               }}
-            />
-          )}
 
           {pantalla === 'admin' && (
             <AdminPage 
@@ -256,8 +336,15 @@ function AppContent() {
               onBack={() => setPantalla("welcome")}
             />
           )}
+            />
+          )}
         </div>
 
+        {pantalla === 'admin' && (
+  <AdminDashboard onBack={() => setPantalla('welcome')} />
+)}
+
+        {/* MODAL ÚNICO DE REGISTRO/EDICIÓN */}
         <RegisterModal 
           open={modalRegisterAbierto}
           onClose={cerrarModal}
