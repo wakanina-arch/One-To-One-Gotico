@@ -14,7 +14,8 @@ const FRASES_ORACULO = [
       "La pasión es el dragón que domas cada mañana.",
       "El hambre de éxito quema más que cualquier fogata.",
       "Tu espíritu es brasa que espera viento para avivarse.",
-      "El fuego no pregunta, transforma. Así será tu victoria."
+      "El fuego no pregunta, transforma. Así será tu victoria.",
+      "Si quieres ver el conjunto, tendrás que reconstruirme tú mismo, afirma ella"
     ]
   },
   
@@ -29,7 +30,8 @@ const FRASES_ORACULO = [
       "El mar que llevas dentro tiene mareas que ni tú comprendes.",
       "El hambre emocional solo se sacia en aguas profundas.",
       "El agua recuerda, el viento olvida. Tú decides qué ser.",
-      "La gota no compite con la roca, la rodea."
+      "La gota no compite con la roca, la rodea.",
+      "muchas obras de los antiguos se han convertido en fragmentos. muchas obras contemporáneas son fragmentos desde el momento en que se escriben."
     ]
   },
   
@@ -44,7 +46,8 @@ const FRASES_ORACULO = [
       "Respira hondo: el universo cabe en un suspiro.",
       "Tu mente es cielo despejado, no permitas nubes ajenas.",
       "El silencio del viento enseña más que cualquier grito.",
-      "Libre como el aire, pero con dirección de flecha."
+      "Libre como el aire, pero con dirección de flecha.",
+      "Aquellos que vagan atrapados en un laberinto, no saben como encontrar la salida."
     ]
   },
   
@@ -59,7 +62,8 @@ const FRASES_ORACULO = [
       "La montaña no busca cumbres, ella es cumbre.",
       "Todo fruto necesita tierra, tiempo y silencio.",
       "La paciencia es el ingrediente que el tiempo no puede comprar.",
-      "Como el barro en el torno, tu destino se moldea con tus manos."
+      "Como el barro en el torno, tu destino se moldea con tus manos.",
+      "En el balaústre mas alto de una gran escalera vi una mano gigantesca enfundada en su armadura."
     ]
   },
   
@@ -74,7 +78,8 @@ const FRASES_ORACULO = [
       "El guerrero sabe que la batalla externa es espejo de la interna.",
       "Tu mayor enemigo duerme en tu misma cama: es tu miedo.",
       "El triunfo no es meta, es camino de quien se atreve.",
-      "El inconsciente colectivo susurra: tú eres todos los que fueron."
+      "El inconsciente colectivo susurra: tú eres todos los que fueron.",
+      "Apacibles, consideradas y alegres danzas en los bosques durante la noche."
     ]
   }
 ];
@@ -258,7 +263,7 @@ export default function WelcomeInicio({ onSelectCategory, usuario, onAbrirRegist
         <p style={styles.footer}>— DESDE EL BARRO —</p>
    
         {/* 🛡️ DASHBOARD - Solo visible para administradores */}
-{usuario && usuario.rol === 'admin_restaurante' && (
+{true &&  (
   <button 
     onClick={onDashboard} 
     style={styles.btnDashboard}
