@@ -1,0 +1,8 @@
+{
+  "rewrites": [
+    {
+      "source": "/api/(.*)",
+      "destination": "https://one-to-one-gotico-backend.vercel.app/api/$1"
+    }
+  ]
+}
