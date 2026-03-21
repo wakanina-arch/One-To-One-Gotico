@@ -1,88 +1,136 @@
 import express from 'express';
-import DailyMenu from '../models/DailyMenu.js';
+import MenuItem from '../models/MenuItem.js';
 import { authMiddleware, adminMiddleware } from '../middleware/auth.js';
 
 const router = express.Router();
 
-// Obtener menú del día
-router.get('/today', async (req, res) => {
+// Obtener todo el menú (público)
+router.get('/', async (req, res) => {
   try {
-    const hoy = new Date();
-    hoy.setHours(0, 0, 0, 0);
-    
-    const mañana = new Date(hoy);
-    mañana.setDate(mañana.getDate() + 1);
-
-    const menuDelDia = await DailyMenu.findOne({
-      fecha: { $gte: hoy, $lt: mañana },
-      activo: true
-    }).populate('platos.menuItemId');
-
-    if (!menuDelDia) {
-      return res.status(404).json({ error: 'Menú del día no disponible' });
-    }
-
-    res.json(menuDelDia);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
-// Obtener menú por fecha
-router.get('/:fecha', async (req, res) => {
-  try {
-    const fecha = new Date(req.params.fecha);
-    fecha.setHours(0, 0, 0, 0);
-    
-    const mañana = new Date(fecha);
-    mañana.setDate(mañana.getDate() + 1);
-
-    const menu = await DailyMenu.findOne({
-      fecha: { $gte: fecha, $lt: mañana }
-    }).populate('platos.menuItemId');
-
-    if (!menu) {
-      return res.status(404).json({ error: 'Menú no encontrado' });
-    }
-
+    const menu = await MenuItem.find().sort({ categoria: 1, fechaCreacion: -1 });
     res.json(menu);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 });
 
-// Crear menú del día (solo admin)
+// Obtener menú por categoría (público)
+router.get('/categoria/:categoria', async (req, res) => {
+  try {
+    const { categoria } = req.params;
+    const menu = await MenuItem.find({ categoria, disponible: true }).sort({ fechaCreacion: -1 });
+    res.json(menu);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Obtener estadísticas del menú (admin) - GALETA INFORMATIVA
+router.get('/stats', authMiddleware, adminMiddleware, async (req, res) => {
+  try {
+    const totalPlatos = await MenuItem.countDocuments();
+    const disponibles = await MenuItem.countDocuments({ disponible: true });
+    
+    // Platos por categoría
+    const porCategoria = await MenuItem.aggregate([
+      { $group: {
+        _id: '$categoria',
+        count: { $sum: 1 },
+        disponibles: { $sum: { $cond: ['$disponible', 1, 0] } }
+      }}
+    ]);
+    
+    // Platos con información nutricional completa
+    const conNutricion = await MenuItem.countDocuments({ 'nutricion.calorias': { $exists: true, $ne: null } });
+    
+    // Platos con historia/ingredientes culturales
+    const conHistoria = await MenuItem.countDocuments({ 
+      $or: [
+        { historiaIngredientes: { $exists: true, $ne: '' } },
+        { ingredientePrincipal: { $exists: true, $ne: '' } }
+      ]
+    });
+    
+    // Alertas de alergias más comunes
+    const alergiasComunes = await MenuItem.aggregate([
+      { $unwind: '$contiene' },
+      { $group: { _id: '$contiene', count: { $sum: 1 } } },
+      { $sort: { count: -1 } },
+      { $limit: 5 }
+    ]);
+    
+    // Dietas especiales
+    const veganos = await MenuItem.countDocuments({ esVegano: true });
+    const vegetarianos = await MenuItem.countDocuments({ esVegetariano: true });
+    
+    res.json({
+      totalPlatos,
+      disponibles,
+      porCategoria,
+      conNutricion,
+      conHistoria,
+      alergiasComunes,
+      dietas: {
+        veganos,
+        vegetarianos
+      }
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Crear nuevo plato (admin)
 router.post('/', authMiddleware, adminMiddleware, async (req, res) => {
   try {
-    const nuevoMenu = new DailyMenu({
-      ...req.body,
-      creadoPor: req.user.id
-    });
-    await nuevoMenu.save();
-    res.status(201).json({
-      mensaje: 'Menú creado exitosamente',
-      menu: nuevoMenu
-    });
+    const nuevoPlato = new MenuItem(req.body);
+    await nuevoPlato.save();
+    res.status(201).json(nuevoPlato);
   } catch (error) {
     res.status(400).json({ error: error.message });
   }
 });
 
-// Actualizar menú (solo admin)
+// Actualizar plato (admin)
 router.put('/:id', authMiddleware, adminMiddleware, async (req, res) => {
   try {
-    const menu = await DailyMenu.findByIdAndUpdate(
+    const plato = await MenuItem.findByIdAndUpdate(
       req.params.id,
       req.body,
-      { new: true }
-    ).populate('platos.menuItemId');
-    
-    res.json({
-      mensaje: 'Menú actualizado exitosamente',
-      menu
-    });
+      { new: true, runValidators: true }
+    );
+    if (!plato) {
+      return res.status(404).json({ error: 'Plato no encontrado' });
+    }
+    res.json(plato);
   } catch (error) {
     res.status(400).json({ error: error.message });
+  }
+});
+
+// Eliminar plato (admin)
+router.delete('/:id', authMiddleware, adminMiddleware, async (req, res) => {
+  try {
+    const plato = await MenuItem.findByIdAndDelete(req.params.id);
+    if (!plato) {
+      return res.status(404).json({ error: 'Plato no encontrado' });
+    }
+    res.json({ mensaje: 'Plato eliminado' });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Obtener un plato específico
+router.get('/:id', async (req, res) => {
+  try {
+    const plato = await MenuItem.findById(req.params.id);
+    if (!plato) {
+      return res.status(404).json({ error: 'Plato no encontrado' });
+    }
+    res.json(plato);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
   }
 });
 

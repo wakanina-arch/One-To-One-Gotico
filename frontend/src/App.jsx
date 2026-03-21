@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { CartProvider, useCart } from "./CartContext.jsx";
+import { MenuProvider } from "./context/MenuContext.jsx";
 import WelcomeInicio from "./WelcomeInicio"; 
 import CategoriaScreen2 from "./components/CategoriaScreen2";
 import ResumenPedido from "./ResumenPedido"; 
@@ -12,7 +13,7 @@ import RegisterModal from "./components/RegisterModal";
 import AdminPage from "./AdminPage";
 import './index.css';
 
-// BASE DE DATOS COMPLETA
+// BASE DE DATOS COMPLETA (respaldo, se usará mientras no haya API)
 const database = {
   primero: { 
     titulo: 'COMPLEMENTOS', icono: '🍟',
@@ -272,8 +273,10 @@ function AppContent() {
 
 export default function App() {
   return (
-    <CartProvider>
-      <AppContent />
-    </CartProvider>
+    <MenuProvider>
+      <CartProvider>
+        <AppContent />
+      </CartProvider>
+    </MenuProvider>
   );
 }

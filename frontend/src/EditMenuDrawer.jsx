@@ -1,3 +1,4 @@
+import { BACKEND_URL } from "../config.js";
 import React, { useState, useEffect } from 'react';
 
 export default function EditMenuDrawer({ open, onClose, menuItems, onSave }) {
@@ -16,7 +17,7 @@ export default function EditMenuDrawer({ open, onClose, menuItems, onSave }) {
   const cargarDatos = async () => {
     setLoading(true);
     try {
-      const response = await fetch('http://localhost:5000/api/menus');
+      const response = await fetch(`${BACKEND_URL}/api/menus`);
       if (!response.ok) {
         throw new Error('Error en la respuesta');
       }
@@ -42,7 +43,7 @@ export default function EditMenuDrawer({ open, onClose, menuItems, onSave }) {
     setSaving(true);
     try {
       for (const item of items) {
-        await fetch(`http://localhost:5000/api/menus/${item._id}`, {
+        await fetch(`${BACKEND_URL}/api/menus/${item._id}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(item)
